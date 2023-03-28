@@ -44,7 +44,7 @@ export const commonCommands: Commands = {
     'awbgains', // Set fixed colour gains <number,number>
     'denoise', // Set the denoising mode <string>
     'tuning-file', //	Specify the camera tuning to use <string>"
-    'output', // Output file name <string>
+    'output', // Output file name <string> or a stream object
     'wrap', // Wrap output file counter at <number>
   ],
 };

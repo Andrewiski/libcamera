@@ -1,5 +1,5 @@
 {
-  "version": "1.0.7",
+  "version": "1.0.8",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -30,8 +30,15 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "libcamera",
+  "name": "@andrewiski/libcamera",
   "author": "Francisco Puig <pacs27>",
+  "contributors": [
+    "Andrew DeVries <adevries@digitalexample.com> (https://www.github.com/andrewiski)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andrewiski/libcamera"
+  },
   "module": "dist/libcamera.esm.js",
   "size-limit": [
     {
