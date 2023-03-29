@@ -69,13 +69,13 @@ function runCommand({
 }) {
   try {
     let results = execute.runCommand({ cmdCommand });
-    results.then(function(exResults){
+    results.then(function(exResults) {
       let resultsType = typeof SpeechRecognitionResultList;
-      if(resultsType !== 'string'){
-        let childProcess = (exResults as ChildProcessWithoutNullStreams);
+      if (resultsType !== 'string') {
+        let childProcess = exResults as ChildProcessWithoutNullStreams;
         let stdOut = childProcess.stdout;
-        let myStreamWritable = (config.output as streamWritable);
-        stdOut.pipe(myStreamWritable, {end:true});
+        let myStreamWritable = config.output as streamWritable;
+        stdOut.pipe(myStreamWritable, { end: true });
         // Handle output stream events
         // outputStream.target.on('close', function() {
         //  self.logger.debug('Output stream closed, scheduling kill for ffmpeg process');
@@ -87,17 +87,16 @@ function runCommand({
         //    emitEnd(new Error('Output stream closed'));
         //    ffmpegProc.kill();
         //  }, 20);
-      //  });
-      //  outputStream.target.on('error', function(err) {
-      //    self.logger.debug('Output stream error, killing ffmpeg process');
-      //    var reportingErr = new Error('Output stream error: ' + err.message);
-      //    reportingErr.outputStreamError = err;
-      //    emitEnd(reportingErr, stdoutRing.get(), stderrRing.get());
-      //    ffmpegProc.kill('SIGKILL');
-      //  });
+        //  });
+        //  outputStream.target.on('error', function(err) {
+        //    self.logger.debug('Output stream error, killing ffmpeg process');
+        //    var reportingErr = new Error('Output stream error: ' + err.message);
+        //    reportingErr.outputStreamError = err;
+        //    emitEnd(reportingErr, stdoutRing.get(), stderrRing.get());
+        //    ffmpegProc.kill('SIGKILL');
+        //  });
       }
-    }
-    );
+    });
     results.catch((err: unknown) => {
       if (err instanceof Error) {
         throw new Error(`Things exploded (${err.message})`);
@@ -136,7 +135,10 @@ function makeJpeg({
     config,
   });
 
-  if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+  if (
+    process.env.NODE_ENV === 'test' ||
+    process.env.NODE_ENV === 'development'
+  ) {
     console.log('cmdCommand = ', cmdCommand);
     return cmdCommand;
   }
@@ -163,7 +165,10 @@ function makeStill({
       config,
     });
 
-    if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+    if (
+      process.env.NODE_ENV === 'test' ||
+      process.env.NODE_ENV === 'development'
+    ) {
       console.log('cmdCommand = ', cmdCommand);
       return cmdCommand;
     }
@@ -197,7 +202,10 @@ function makeVid({
       config,
     });
 
-    if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+    if (
+      process.env.NODE_ENV === 'test' ||
+      process.env.NODE_ENV === 'development'
+    ) {
       console.log('cmdCommand = ', cmdCommand);
       return cmdCommand;
     }
@@ -231,11 +239,14 @@ function makeRaw({
       config,
     });
 
-    if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+    if (
+      process.env.NODE_ENV === 'test' ||
+      process.env.NODE_ENV === 'development'
+    ) {
       console.log('cmdCommand = ', cmdCommand);
       return cmdCommand;
     }
-    return runCommand({ execute, cmdCommand,config });
+    return runCommand({ execute, cmdCommand, config });
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(`Things exploded (${err.message})`);
@@ -266,7 +277,7 @@ function createTakePictureCommand({
     base: baseType,
     params: prepareConfigOptsAndFlags(config, { Flags, Options }),
   });
- 
+
   return cmdCommand;
 }
 
@@ -278,8 +289,6 @@ function configShouldBeAnObject({ config }: { config: any }) {
   }
 }
 
-
-
 function prepareConfigOptsAndFlags(
   config: any,
   { Flags, Options }: { Flags: Commands['Flags']; Options: Commands['Options'] }
@@ -290,33 +299,32 @@ function prepareConfigOptsAndFlags(
     // Only include flags if they're set to true
     if (Flags.includes(key) && config[key]) {
       configArray.push(`--${key}`);
-    } else if (Options.includes(key)) 
-    {
-      if(key === "output" 
-        && config[key] !== null 
-        && typeof config[key] === 'object' 
-        && typeof config[key].pipe === 'function'    
-        )
-      {
+    } else if (Options.includes(key)) {
+      if (
+        key === 'output' &&
+        config[key] !== null &&
+        typeof config[key] === 'object' &&
+        typeof config[key].pipe === 'function'
+      ) {
         //This is a request to output the data to a stream object
-        if(config[key].writable !== false
-          && typeof config[key]._write === 'function'
-          && typeof config[key]._writableState === 'object')
-        {
+        if (
+          config[key].writable !== false &&
+          typeof config[key]._write === 'function' &&
+          typeof config[key]._writableState === 'object'
+        ) {
           outputIsStream = true;
           //-o -
           //configArray.push(`--${key}`, config[key]);
-          configArray.push(`-o`, "-");
-        }else{
-          throw new Error("Stream is not writable");
-        } 
-        
-      }else{
+          configArray.push(`-o`, '-');
+        } else {
+          throw new Error('Stream is not writable');
+        }
+      } else {
         configArray.push(`--${key}`, config[key]);
       }
     }
   });
-  if(outputIsStream){
+  if (outputIsStream) {
     config.outputIsStream = true;
   }
   return configArray;
