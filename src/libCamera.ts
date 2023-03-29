@@ -1,4 +1,5 @@
 import { Writable as streamWritable } from 'stream';
+import { Execute } from './utils/types';
 import { PiCameraOutput, PiCameraConfig, Commands } from './types';
 import { ChildProcessWithoutNullStreams } from 'child_process';
 
