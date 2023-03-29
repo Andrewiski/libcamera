@@ -37,6 +37,6 @@ const { Stream } = require("stream");
     incomingTransStream.pipe(incomingMonitorStream);
 
     libcamera
-    .vid({ config: { output: 'test.h264' } })
-    .then(result => console.log(result))
-    .catch(err => console.log(err));
+    .vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, "output": incomingTransStream } })
+    //.then(result => console.log(result))
+    //.catch(err => console.log(err));

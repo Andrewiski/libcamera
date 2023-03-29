@@ -20,21 +20,23 @@ export default function makeExecute({ exec }: { exec: any }): Execute {
   }): Promise<ChildProcessWithoutNullStreams | string> {
     try {
       return new Promise((resolve, reject) => {
-        exec(
+       let myChildProcess = exec(
           cmdCommand,
           options,
-          (error: ExecException | null, stdout: string, stderr: string) => {
+          (error: ExecException | null, stdout: any, stderr: any) => {
             if (error) {
               if (stderr) {
                 reject(stderr.trim());
               }
               reject(error);
             }
-            if (stdout) {
+            if ( typeof stdout === "string") {
               resolve(stdout.trim());
             }
-            if (stderr) {
+            if (typeof stderr === "string") {
               resolve(stderr.trim());
+            }else{
+              resolve(myChildProcess as ChildProcessWithoutNullStreams);
             }
           }
         );
