@@ -46,7 +46,7 @@ export const commonCommands: Commands = {
     'tuning-file', //	Specify the camera tuning to use <string>"
     'output', // Output file name <string> or a stream object
     'wrap', // Wrap output file counter at <number>
-    'autofocus-mode',  // Wrap output file counter at <manual, auto, continuous>
+    'autofocus-mode', // Wrap output file counter at <manual, auto, continuous>
   ],
 };
 
