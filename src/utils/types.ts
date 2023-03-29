@@ -15,5 +15,5 @@ export interface Execute {
   }: {
     base: string;
     params: Array<string>;
-  }) =>  string;
+  }) => string;
 }

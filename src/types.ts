@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
-import {Writable as streamWritable} from 'stream'
+import { Writable as streamWritable } from 'stream'
 
 export interface PiCameraOutput {
   jpeg: ({
