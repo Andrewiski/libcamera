@@ -30,7 +30,7 @@ export default function makeExecute({ exec }: { exec: any }): Execute {
               }
               reject(error);
             }
-            if ( typeof stdout === 'string') {
+            if (typeof stdout === 'string') {
               resolve(stdout.trim());
             }
             if (typeof stderr === 'string') {
