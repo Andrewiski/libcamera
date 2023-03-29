@@ -1,5 +1,4 @@
-import {Writable as streamWritable} from 'stream'
-import { Execute } from './utils/types';
+import { Writable as streamWritable } from 'stream';
 import { PiCameraOutput, PiCameraConfig, Commands } from './types';
 import { ChildProcessWithoutNullStreams } from 'child_process';
 
@@ -61,7 +60,7 @@ export default function buildMakeLibCamera({
 function runCommand({
   execute,
   cmdCommand,
-  config
+  config,
 }: {
   execute: Execute;
   cmdCommand: string;
@@ -69,40 +68,38 @@ function runCommand({
 }) {
   try {
     let results = execute.runCommand({ cmdCommand });
-    
     results.then(
-     
-            function(results){
-              let resultsType = typeof SpeechRecognitionResultList;
-              if(resultsType !== "string"){
-                let childProcess = (results as ChildProcessWithoutNullStreams)
-                let stdOut = childProcess.stdout;
-                let myStreamWritable = (config.output as streamWritable)
-                stdOut.pipe(myStreamWritable, {end:true});
-      
-                // Handle output stream events
-                // outputStream.target.on('close', function() {
-                //  self.logger.debug('Output stream closed, scheduling kill for ffmpeg process');
-      
-                //  // Don't kill process yet, to give a chance to ffmpeg to
-                //  // terminate successfully first  This is necessary because
-                //  // under load, the process 'exit' event sometimes happens
-                //  // after the output stream 'close' event.
-                //  setTimeout(function() {
-                //    emitEnd(new Error('Output stream closed'));
-                //    ffmpegProc.kill();
-                //  }, 20);
-              //  });
-      
-              //  outputStream.target.on('error', function(err) {
-              //    self.logger.debug('Output stream error, killing ffmpeg process');
-              //    var reportingErr = new Error('Output stream error: ' + err.message);
-              //    reportingErr.outputStreamError = err;
-              //    emitEnd(reportingErr, stdoutRing.get(), stderrRing.get());
-              //    ffmpegProc.kill('SIGKILL');
-              //  });
-              }
+      function(exResults){
+        let resultsType = typeof SpeechRecognitionResultList;
+        if(resultsType !== "string"){
+          let childProcess = (exResults as ChildProcessWithoutNullStreams)
+          let stdOut = childProcess.stdout;
+          let myStreamWritable = (config.output as streamWritable)
+          stdOut.pipe(myStreamWritable, {end:true});
+
+          // Handle output stream events
+          // outputStream.target.on('close', function() {
+          //  self.logger.debug('Output stream closed, scheduling kill for ffmpeg process');
+
+          //  // Don't kill process yet, to give a chance to ffmpeg to
+          //  // terminate successfully first  This is necessary because
+          //  // under load, the process 'exit' event sometimes happens
+          //  // after the output stream 'close' event.
+          //  setTimeout(function() {
+          //    emitEnd(new Error('Output stream closed'));
+          //    ffmpegProc.kill();
+          //  }, 20);
+        //  });
+
+        //  outputStream.target.on('error', function(err) {
+        //    self.logger.debug('Output stream error, killing ffmpeg process');
+        //    var reportingErr = new Error('Output stream error: ' + err.message);
+        //    reportingErr.outputStreamError = err;
+        //    emitEnd(reportingErr, stdoutRing.get(), stderrRing.get());
+        //    ffmpegProc.kill('SIGKILL');
+        //  });
         }
+      }
     );
     results.catch((err: unknown) => {
       if (err instanceof Error) {
