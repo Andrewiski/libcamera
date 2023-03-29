@@ -17,6 +17,9 @@ export default function buildMakeLibCamera({
   rawCommands: Commands;
 }) {
   return function makeLibCamera(): PiCameraOutput {
+    if (process.env.NODE_ENV) {
+      console.log('NODE_ENV= ', process.env.NODE_ENV);
+    }
     return Object.freeze({
       jpeg: ({ config }: { config: PiCameraConfig }) => {
         config = configShouldBeAnObject({ config });

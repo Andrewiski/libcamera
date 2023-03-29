@@ -5,10 +5,11 @@ const { libcamera } = require('../dist/index.js');
 const { Stream } = require("stream");
 
     var incomingTransStream = null;
-    //var incomingTransStreamChunkCounter = 0;
+    var incomingTransStreamChunkCounter = 0;
     incomingTransStream = new Stream.Transform();
     incomingTransStream._transform = function (chunk, encoding, done) {
         try {
+            incomingTransStreamChunkCounter++;
             this.push(chunk);
             return done();
         } catch (ex) {
@@ -35,8 +36,9 @@ const { Stream } = require("stream");
     };
 
     incomingTransStream.pipe(incomingMonitorStream);
+    console.log("Starting libcamera")
 
     libcamera
-    .vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, "output": incomingTransStream } })
-    //.then(result => console.log(result))
-    //.catch(err => console.log(err));
+    .vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, timeout:10000, "output": incomingTransStream } })
+    .then(result => console.log("Got Results"))
+    .catch(err => console.log(err));
