@@ -28,7 +28,7 @@ export default function makeExecute({ exec }: { exec: any }): Execute {
         localDebug = true;
         console.log('execute LocalDebug Enabled');
       }
-
+      console.log('execute localDebug');
       return new Promise((resolve, reject) => {
         let myChildProcess = exec(
           cmdCommand,
