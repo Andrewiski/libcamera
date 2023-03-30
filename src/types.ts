@@ -88,3 +88,8 @@ export interface Commands {
   Flags: Array<string>;
   Options: Array<string>;
 }
+
+export interface Command {
+  base: string;
+  params: Array<string>;
+}

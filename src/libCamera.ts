@@ -8,7 +8,7 @@ import {
   ChildProcessWithoutNullStreams,
   ChildProcess,
 } from 'child_process';
-import { PiCameraOutput, PiCameraConfig, Commands } from './types';
+import { PiCameraOutput, PiCameraConfig, Commands, Command } from './types';
 
 export default function buildMakeLibCamera({
   jpegCommands,
@@ -75,7 +75,7 @@ function makeJpeg({
   Options: Commands['Options'];
   config: PiCameraConfig;
 }) {
-  const cmd = createTakePictureCommand({
+  const cmd : Command = createTakePictureCommand({
     baseType: 'libcamera-jpeg',
     Flags,
     Options,
@@ -86,7 +86,7 @@ function makeJpeg({
     console.log('cmdCommand = ', cmd);
   }
   if (process.env.NODE_ENV === 'test') {
-    return cmd;
+    return parseCommand(cmd);
   }
   return runCommand({ cmd, config });
 }
@@ -101,7 +101,7 @@ function makeStill({
   config: PiCameraConfig;
 }) {
   try {
-    const cmd = createTakePictureCommand({
+    const cmd : Command = createTakePictureCommand({
       baseType: 'libcamera-still',
       Flags,
       Options,
@@ -112,7 +112,7 @@ function makeStill({
       console.log('cmdCommand = ', cmd);
     }
     if (process.env.NODE_ENV === 'test') {
-      return cmd;
+      return parseCommand(cmd);
     }
     return runCommand({ cmd, config });
   } catch (err) {
@@ -134,7 +134,7 @@ function makeVid({
   config: PiCameraConfig;
 }) {
   try {
-    const cmd = createTakePictureCommand({
+    const cmd : Command = createTakePictureCommand({
       baseType: 'libcamera-vid',
       Flags,
       Options,
@@ -145,7 +145,7 @@ function makeVid({
       console.log('cmdCommand = ', cmd);
     }
     if (process.env.NODE_ENV === 'test') {
-      return cmd;
+      return parseCommand(cmd);
     }
     return runCommand({ cmd, config });
   } catch (err) {
@@ -167,7 +167,7 @@ function makeRaw({
   config: PiCameraConfig;
 }) {
   try {
-    const cmd = createTakePictureCommand({
+    const cmd : Command = createTakePictureCommand({
       baseType: 'libcamera-raw',
       Flags,
       Options,
@@ -178,7 +178,7 @@ function makeRaw({
       console.log('cmdCommand = ', cmd);
     }
     if (process.env.NODE_ENV === 'test') {
-      return cmd;
+      return parseCommand(cmd);
     }
     return runCommand({ cmd, config });
   } catch (err) {
@@ -205,10 +205,10 @@ function createTakePictureCommand({
   Options: Commands['Options'];
   config: PiCameraConfig;
 }) {
-  const cmd = cmdCommand({
+  const cmd : Command = {
     base: baseType,
     params: prepareConfigOptsAndFlags(config, { Flags, Options }),
-  });
+  };
 
   return cmd;
 }
@@ -261,23 +261,24 @@ function prepareConfigOptsAndFlags(
   }
   return configArray;
 }
-function cmdCommand({ base, params }: { base: string; params: Array<string> }) {
-  if (!params && base) {
-    return base;
+
+function parseCommand( cmd : Command) {
+  if (!cmd.params && cmd.base) {
+    return cmd.base;
   }
 
-  if (!Array.isArray(params)) {
+  if (!Array.isArray(cmd.params)) {
     throw new Error('params must be an Array');
   }
 
-  return base + ' ' + params.join(' ');
+  return cmd.base + ' ' + cmd.params.join(' ');
 }
 
 function runCommand({
   cmd,
   config,
 }: {
-  cmd: string;
+  cmd: Command;
   config: PiCameraConfig;
 }): Promise<
   | ChildProcess
@@ -294,10 +295,12 @@ function runCommand({
   try {
     return new Promise((resolve, reject) => {
       try {
-        let myIoOutWritable: StdioNull | StdioPipe = 'ignore';
-        let myIoErrWritable: StdioNull | StdioPipe = 'ignore';
+        let stdIn: StdioNull | StdioPipe = 'ignore';
+        let stdOut: StdioNull | StdioPipe = 'ignore';
+        let stdErr: StdioNull | StdioPipe = 'ignore';
+        
         if (config.outputIsStream) {
-          myIoOutWritable = config.output as Writable;
+          stdOut = config.output as Writable;
         }
         let spawnOptions: SpawnOptionsWithStdioTuple<
           StdioNull | StdioPipe,
@@ -305,7 +308,7 @@ function runCommand({
           StdioNull | StdioPipe
         > = {
           argv0: undefined,
-          stdio: ['ignore', myIoOutWritable, myIoErrWritable], //'overlapped' | 'pipe' | 'ignore' | 'inherit';
+          stdio:  [stdIn, stdOut, stdErr], //'overlapped' | 'pipe' | 'ignore' | 'inherit';
           shell: undefined,
           windowsVerbatimArguments: undefined,
           detached: false,
@@ -320,7 +323,7 @@ function runCommand({
           | ChildProcessByStdio<Writable, null, null>
           | ChildProcessByStdio<null, Readable, null>
           | ChildProcessByStdio<null, null, Readable>
-          | ChildProcessByStdio<null, null, null> = spawn(cmd, spawnOptions);
+          | ChildProcessByStdio<null, null, null> = spawn(cmd.base, cmd.params, spawnOptions);
         //let stdOut = myChildProcess.stdout;
 
         //stdOut.pipe(myStreamWritable, { end: true });
