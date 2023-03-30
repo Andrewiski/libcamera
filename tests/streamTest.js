@@ -43,5 +43,8 @@ const { Stream } = require("stream");
         results.then(result => console.log("Got Results"))
         results.catch(err => console.log(err));
     }else{
-        console.log("results=" + typeof results);
+        console.log("results typeof=" + typeof results);
+        if (typeof results === 'string'){
+            console.log("results=" + results )
+        }
     }
