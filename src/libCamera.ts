@@ -78,9 +78,9 @@ function runCommand({
   config: PiCameraConfig;
 }) {
   try {
-    if (localDebug) {
+    // if (localDebug) {
       console.log('runCommand called');
-    }
+    //}
     let results = execute.runCommand({ cmdCommand });
     results.then(function(exResults) {
       let resultsType = typeof exResults;
@@ -156,7 +156,6 @@ function makeJpeg({
 
   if (localDebug === true) {
     console.log('cmdCommand = ', cmdCommand);
-    return cmdCommand;
   }
   return runCommand({ execute, cmdCommand, config });
 }
@@ -183,7 +182,6 @@ function makeStill({
 
     if (localDebug === true) {
       console.log('cmdCommand = ', cmdCommand);
-      return cmdCommand;
     }
     return runCommand({ execute, cmdCommand, config });
   } catch (err) {
@@ -217,7 +215,6 @@ function makeVid({
 
     if (localDebug === true) {
       console.log('cmdCommand = ', cmdCommand);
-      return cmdCommand;
     }
     return runCommand({ execute, cmdCommand, config });
   } catch (err) {
@@ -251,7 +248,6 @@ function makeRaw({
 
     if (localDebug === true) {
       console.log('cmdCommand = ', cmdCommand);
-      return cmdCommand;
     }
     return runCommand({ execute, cmdCommand, config });
   } catch (err) {
