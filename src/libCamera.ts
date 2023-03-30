@@ -75,7 +75,7 @@ function makeJpeg({
   Options: Commands['Options'];
   config: PiCameraConfig;
 }) {
-  const cmd : Command = createTakePictureCommand({
+  const cmd: Command = createTakePictureCommand({
     baseType: 'libcamera-jpeg',
     Flags,
     Options,
@@ -101,7 +101,7 @@ function makeStill({
   config: PiCameraConfig;
 }) {
   try {
-    const cmd : Command = createTakePictureCommand({
+    const cmd: Command = createTakePictureCommand({
       baseType: 'libcamera-still',
       Flags,
       Options,
@@ -134,7 +134,7 @@ function makeVid({
   config: PiCameraConfig;
 }) {
   try {
-    const cmd : Command = createTakePictureCommand({
+    const cmd: Command = createTakePictureCommand({
       baseType: 'libcamera-vid',
       Flags,
       Options,
@@ -167,7 +167,7 @@ function makeRaw({
   config: PiCameraConfig;
 }) {
   try {
-    const cmd : Command = createTakePictureCommand({
+    const cmd: Command = createTakePictureCommand({
       baseType: 'libcamera-raw',
       Flags,
       Options,
@@ -205,7 +205,7 @@ function createTakePictureCommand({
   Options: Commands['Options'];
   config: PiCameraConfig;
 }) {
-  const cmd : Command = {
+  const cmd: Command = {
     base: baseType,
     params: prepareConfigOptsAndFlags(config, { Flags, Options }),
   };
@@ -262,7 +262,7 @@ function prepareConfigOptsAndFlags(
   return configArray;
 }
 
-function parseCommand( cmd : Command) {
+function parseCommand(cmd: Command) {
   if (!cmd.params && cmd.base) {
     return cmd.base;
   }
@@ -298,7 +298,7 @@ function runCommand({
         let stdIn: StdioNull | StdioPipe = 'ignore';
         let stdOut: StdioNull | StdioPipe = 'ignore';
         let stdErr: StdioNull | StdioPipe = 'ignore';
-        
+
         if (config.outputIsStream) {
           stdOut = config.output as Writable;
         }
@@ -308,7 +308,7 @@ function runCommand({
           StdioNull | StdioPipe
         > = {
           argv0: undefined,
-          stdio:  [stdIn, stdOut, stdErr], //'overlapped' | 'pipe' | 'ignore' | 'inherit';
+          stdio: [stdIn, stdOut, stdErr], //'overlapped' | 'pipe' | 'ignore' | 'inherit';
           shell: undefined,
           windowsVerbatimArguments: undefined,
           detached: false,
@@ -323,7 +323,11 @@ function runCommand({
           | ChildProcessByStdio<Writable, null, null>
           | ChildProcessByStdio<null, Readable, null>
           | ChildProcessByStdio<null, null, Readable>
-          | ChildProcessByStdio<null, null, null> = spawn(cmd.base, cmd.params, spawnOptions);
+          | ChildProcessByStdio<null, null, null> = spawn(
+          cmd.base,
+          cmd.params,
+          spawnOptions
+        );
         //let stdOut = myChildProcess.stdout;
 
         //stdOut.pipe(myStreamWritable, { end: true });
