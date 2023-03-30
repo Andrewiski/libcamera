@@ -1,15 +1,15 @@
 import { Writable as streamWritable } from 'stream';
-import { Execute } from './utils/types';
+import { Spawn } from './utils/types';
 import { PiCameraOutput, PiCameraConfig, Commands } from './types';
 
 export default function buildMakeLibCamera({
-  execute,
+  spawn,
   jpegCommands,
   stillCommands,
   vidCommands,
   rawCommands,
 }: {
-  execute: Execute;
+  spawn: Spawn;
   jpegCommands: Commands;
   stillCommands: Commands;
   vidCommands: Commands;
@@ -22,7 +22,7 @@ export default function buildMakeLibCamera({
         return makeJpeg({
           Flags: jpegCommands.Flags,
           Options: jpegCommands.Options,
-          execute,
+          spawn,
           config,
         });
       },
@@ -31,7 +31,7 @@ export default function buildMakeLibCamera({
         return makeStill({
           Flags: stillCommands.Flags,
           Options: stillCommands.Options,
-          execute,
+          spawn,
           config,
         });
       },
@@ -40,7 +40,7 @@ export default function buildMakeLibCamera({
         return makeVid({
           Flags: vidCommands.Flags,
           Options: vidCommands.Options,
-          execute,
+          spawn,
           config,
         });
       },
@@ -49,7 +49,7 @@ export default function buildMakeLibCamera({
         return makeRaw({
           Flags: rawCommands.Flags,
           Options: rawCommands.Options,
-          execute,
+          spawn,
           config,
         });
       },
@@ -68,11 +68,11 @@ if (localDebug) {
   console.log('localDebug=true');
 }
 function runCommand({
-  execute,
+  spawn,
   cmdCommand,
   config,
 }: {
-  execute: Execute;
+  spawn: Spawn;
   cmdCommand: string;
   config: PiCameraConfig;
 }) {
@@ -80,7 +80,7 @@ function runCommand({
     // if (localDebug) {
     console.log('runCommand called');
     //}
-    let results = execute.runCommand({ cmdCommand });
+    let results = spawn.runCommand({ cmdCommand });
     results.then(function(exResults) {
       //let childProcess = exResults.childProcess;
       if (typeof exResults.stdout !== 'string') {
@@ -134,37 +134,37 @@ function runCommand({
 function makeJpeg({
   Flags,
   Options,
-  execute,
+  spawn,
   config,
 }: {
   Flags: Commands['Flags'];
   Options: Commands['Options'];
-  execute: Execute;
+  spawn: Spawn;
   config: PiCameraConfig;
 }) {
   const cmdCommand = createTakePictureCommand({
     baseType: 'libcamera-jpeg',
     Flags,
     Options,
-    execute,
+    spawn,
     config,
   });
 
   if (localDebug === true) {
     console.log('cmdCommand = ', cmdCommand);
   }
-  return runCommand({ execute, cmdCommand, config });
+  return runCommand({ spawn, cmdCommand, config });
 }
 
 function makeStill({
   Flags,
   Options,
-  execute,
+  spawn,
   config,
 }: {
   Flags: Commands['Flags'];
   Options: Commands['Options'];
-  execute: Execute;
+  spawn: Spawn;
   config: PiCameraConfig;
 }) {
   try {
@@ -172,14 +172,14 @@ function makeStill({
       baseType: 'libcamera-still',
       Flags,
       Options,
-      execute,
+      spawn,
       config,
     });
 
     if (localDebug === true) {
       console.log('cmdCommand = ', cmdCommand);
     }
-    return runCommand({ execute, cmdCommand, config });
+    return runCommand({ spawn, cmdCommand, config });
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(`Things exploded (${err.message})`);
@@ -192,12 +192,12 @@ function makeStill({
 function makeVid({
   Flags,
   Options,
-  execute,
+  spawn,
   config,
 }: {
   Flags: Commands['Flags'];
   Options: Commands['Options'];
-  execute: Execute;
+  spawn: Spawn;
   config: PiCameraConfig;
 }) {
   try {
@@ -205,14 +205,14 @@ function makeVid({
       baseType: 'libcamera-vid',
       Flags,
       Options,
-      execute,
+      spawn,
       config,
     });
 
     if (localDebug === true) {
       console.log('cmdCommand = ', cmdCommand);
     }
-    return runCommand({ execute, cmdCommand, config });
+    return runCommand({ spawn, cmdCommand, config });
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(`Things exploded (${err.message})`);
@@ -225,12 +225,12 @@ function makeVid({
 function makeRaw({
   Flags,
   Options,
-  execute,
+  spawn,
   config,
 }: {
   Flags: Commands['Flags'];
   Options: Commands['Options'];
-  execute: Execute;
+  spawn: Spawn;
   config: PiCameraConfig;
 }) {
   try {
@@ -238,14 +238,14 @@ function makeRaw({
       baseType: 'libcamera-raw',
       Flags,
       Options,
-      execute,
+      spawn,
       config,
     });
 
     if (localDebug === true) {
       console.log('cmdCommand = ', cmdCommand);
     }
-    return runCommand({ execute, cmdCommand, config });
+    return runCommand({ spawn, cmdCommand, config });
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(`Things exploded (${err.message})`);
@@ -259,7 +259,7 @@ function createTakePictureCommand({
   baseType,
   Flags,
   Options,
-  execute,
+  spawn,
   config,
 }: {
   baseType:
@@ -269,10 +269,10 @@ function createTakePictureCommand({
     | 'libcamera-raw';
   Flags: Commands['Flags'];
   Options: Commands['Options'];
-  execute: Execute;
+  spawn: Spawn;
   config: PiCameraConfig;
 }) {
-  const cmdCommand = execute.cmdCommand({
+  const cmdCommand = spawn.cmdCommand({
     base: baseType,
     params: prepareConfigOptsAndFlags(config, { Flags, Options }),
   });

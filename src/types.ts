@@ -1,27 +1,28 @@
-import { Writable as streamWritable } from 'stream';
-import { ExecuteResult } from './utils/types';
+import { Writable as streamWritable, Readable } from 'stream';
+import { ChildProcessByStdio } from 'child_process';
+
 
 export interface PiCameraOutput {
   jpeg: ({
     config,
   }: {
     config: PiCameraConfig;
-  }) => string | Promise<ExecuteResult>;
+  }) => string | Promise<ChildProcessByStdio<null, Readable, Readable>>;
   still: ({
     config,
   }: {
     config: PiCameraConfig;
-  }) => string | Promise<ExecuteResult>;
+  }) => string | Promise<ChildProcessByStdio<null, Readable, Readable>>;
   vid: ({
     config,
   }: {
     config: PiCameraConfig;
-  }) => string | Promise<ExecuteResult>;
+  }) => string | Promise<ChildProcessByStdio<null, Readable, Readable>>;
   raw: ({
     config,
   }: {
     config: PiCameraConfig;
-  }) => string | Promise<ExecuteResult>;
+  }) => string | Promise<ChildProcessByStdio<null, Readable, Readable>>;
 }
 
 export interface PiCameraConfig {

@@ -1,6 +1,7 @@
-import { exec } from 'child_process';
-import makeExecute from './execute';
+import { exec, spawn } from 'child_process';
+import {makeExecute, makeSpawn} from './execute';
 
 const execute = makeExecute({ exec });
+const spawnproc = makeSpawn({ spawn });
 
-export { execute };
+export { execute,spawnproc };
