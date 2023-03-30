@@ -295,12 +295,15 @@ function runCommand({
   try {
     return new Promise((resolve, reject) => {
       try {
-        let stdIn: StdioNull | StdioPipe = 'ignore';
+        let stdIn: StdioNull | StdioPipe = null;
         let stdOut: StdioNull | StdioPipe = 'ignore';
-        let stdErr: StdioNull | StdioPipe = 'ignore';
+        let stdErr: StdioNull | StdioPipe = null;
 
         if (config.outputIsStream) {
           stdOut = config.output as Writable;
+          if(localDebug){
+            console.log("output is piped to stdOut")
+          }
         }
         let spawnOptions: SpawnOptionsWithStdioTuple<
           StdioNull | StdioPipe,
