@@ -78,6 +78,9 @@ function runCommand({
   config: PiCameraConfig;
 }) {
   try {
+    if (localDebug) {
+      console.log('runCommand called');
+    }
     let results = execute.runCommand({ cmdCommand });
     results.then(function(exResults) {
       let resultsType = typeof exResults;
@@ -111,6 +114,9 @@ function runCommand({
       }
     });
     results.catch((err: unknown) => {
+      if (localDebug) {
+        console.log('run command error');
+      }
       if (err instanceof Error) {
         throw new Error(`Things exploded (${err.message})`);
       } else if (typeof err === 'string') {
