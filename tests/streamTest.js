@@ -38,7 +38,10 @@ const { Stream } = require("stream");
     incomingTransStream.pipe(incomingMonitorStream);
     console.log("Starting libcamera")
 
-    libcamera
-    .vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, timeout:10000, "output": incomingTransStream } })
-    .then(result => console.log("Got Results"))
-    .catch(err => console.log(err));
+    let results = libcamera.vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, timeout:10000, "output": incomingTransStream } })
+    if(results.then !== undefined){
+        results.then(result => console.log("Got Results"))
+        results.catch(err => console.log(err));
+    }else{
+        console.log("results=" + typeof results);
+    }
