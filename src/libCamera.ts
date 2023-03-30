@@ -1,7 +1,6 @@
 import { Writable as streamWritable } from 'stream';
 import { Execute } from './utils/types';
 import { PiCameraOutput, PiCameraConfig, Commands } from './types';
-import { ChildProcessWithoutNullStreams } from 'child_process';
 
 export default function buildMakeLibCamera({
   execute,
@@ -79,14 +78,13 @@ function runCommand({
 }) {
   try {
     // if (localDebug) {
-      console.log('runCommand called');
+    console.log('runCommand called');
     //}
     let results = execute.runCommand({ cmdCommand });
     results.then(function(exResults) {
-      
       //let childProcess = exResults.childProcess;
-      if(typeof exResults.stdout !== "string"){
-        console.log("stdOutType=" + typeof exResults.stdout);
+      if (typeof exResults.stdout !== 'string') {
+        console.log('stdOutType=' + typeof exResults.stdout);
         let stdOut = exResults.stdout;
         let myStreamWritable = config.output as streamWritable;
         stdOut.pipe(myStreamWritable, { end: true });

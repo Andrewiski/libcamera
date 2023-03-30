@@ -18,8 +18,8 @@ export interface Execute {
   }) => string;
 }
 export interface ExecuteResult {
-  error: ExecException | null,
-  stdout: any, 
-  stderr: any,
-  childProcess: ChildProcessWithoutNullStreams | null
+  error: ExecException | null;
+  stdout: any;
+  stderr: any;
+  childProcess: ChildProcessWithoutNullStreams | null;
 }

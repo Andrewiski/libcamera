@@ -1,7 +1,4 @@
-import {
-  ExecException,
-  ExecOptions,
-} from 'child_process';
+import { ExecException, ExecOptions } from 'child_process';
 import { Execute, ExecuteResult } from './types';
 
 export default function makeExecute({ exec }: { exec: any }): Execute {
@@ -32,12 +29,11 @@ export default function makeExecute({ exec }: { exec: any }): Execute {
           cmdCommand,
           options,
           (error: ExecException | null, stdout: any, stderr: any) => {
-
             let myResult = {
               error: error,
-              stdout: stdout, 
+              stdout: stdout,
               stderr: stderr,
-              childProcess: myChildProcess
+              childProcess: myChildProcess,
             };
             if (error) {
               if (localDebug) {
@@ -50,7 +46,7 @@ export default function makeExecute({ exec }: { exec: any }): Execute {
               //   reject(error);
               // }
               reject(myResult);
-            }else{
+            } else {
               resolve(myResult);
             }
             // if (typeof stdout === 'string') {

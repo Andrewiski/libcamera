@@ -1,4 +1,3 @@
-import { ChildProcessWithoutNullStreams } from 'child_process';
 import { Writable as streamWritable } from 'stream';
 import { ExecuteResult } from './utils/types';
 
