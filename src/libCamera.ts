@@ -296,11 +296,11 @@ function runCommand({
     return new Promise((resolve, reject) => {
       try {
         let stdIn: StdioNull | StdioPipe = null;
-        let stdOut: StdioNull | StdioPipe = 'ignore';
+        let stdOut: StdioNull | StdioPipe = null;
         let stdErr: StdioNull | StdioPipe = null;
 
         if (config.outputIsStream) {
-          stdOut = config.output as Writable;
+          //stdOut = config.output as Writable;
           if(localDebug){
             console.log("output is piped to stdOut")
           }
