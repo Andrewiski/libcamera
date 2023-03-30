@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams } from 'child_process';
+import { ExecException, ChildProcessWithoutNullStreams } from 'child_process';
 
 export interface Execute {
   runCommand: ({
@@ -7,7 +7,7 @@ export interface Execute {
   }: {
     cmdCommand: string;
     options?: any;
-  }) => Promise<ChildProcessWithoutNullStreams | string>;
+  }) => Promise<ExecuteResult>;
 
   cmdCommand: ({
     base,
@@ -16,4 +16,10 @@ export interface Execute {
     base: string;
     params: Array<string>;
   }) => string;
+}
+export interface ExecuteResult {
+  error: ExecException | null,
+  stdout: any, 
+  stderr: any,
+  childProcess: ChildProcessWithoutNullStreams | null
 }

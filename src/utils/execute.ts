@@ -1,9 +1,8 @@
 import {
-  ChildProcessWithoutNullStreams,
   ExecException,
   ExecOptions,
 } from 'child_process';
-import { Execute } from './types';
+import { Execute, ExecuteResult } from './types';
 
 export default function makeExecute({ exec }: { exec: any }): Execute {
   return Object.freeze({
@@ -17,7 +16,7 @@ export default function makeExecute({ exec }: { exec: any }): Execute {
   }: {
     cmdCommand: string;
     options?: ExecOptions;
-  }): Promise<ChildProcessWithoutNullStreams | string> {
+  }): Promise<ExecuteResult> {
     try {
       let localDebug = false;
       if (
@@ -28,39 +27,49 @@ export default function makeExecute({ exec }: { exec: any }): Execute {
         localDebug = true;
         console.log('execute LocalDebug Enabled');
       }
-      console.log('execute localDebug');
       return new Promise((resolve, reject) => {
         let myChildProcess = exec(
           cmdCommand,
           options,
           (error: ExecException | null, stdout: any, stderr: any) => {
+
+            let myResult = {
+              error: error,
+              stdout: stdout, 
+              stderr: stderr,
+              childProcess: myChildProcess
+            };
             if (error) {
               if (localDebug) {
                 console.log('execute error');
+                console.log('error=' + error.message);
               }
-              if (stderr) {
-                reject(stderr.trim());
-              } else {
-                reject(error);
-              }
+              // if (stderr) {
+              //   reject(stderr.trim());
+              // } else {
+              //   reject(error);
+              // }
+              reject(myResult);
+            }else{
+              resolve(myResult);
             }
-            if (typeof stdout === 'string') {
-              if (localDebug) {
-                console.log('execute stdout===string');
-              }
-              resolve(stdout.trim());
-            }
-            if (typeof stderr === 'string') {
-              if (localDebug) {
-                console.log('execute stderr===string');
-              }
-              resolve(stderr.trim());
-            } else {
-              if (localDebug) {
-                console.log('execute returning myChildProcess');
-              }
-              resolve(myChildProcess as ChildProcessWithoutNullStreams);
-            }
+            // if (typeof stdout === 'string') {
+            //   if (localDebug) {
+            //     console.log('execute stdout===string');
+            //   }
+            //   resolve(stdout.trim());
+            // }
+            // if (typeof stderr === 'string') {
+            //   if (localDebug) {
+            //     console.log('execute stderr===string');
+            //   }
+            //   resolve(stderr.trim());
+            // } else {
+            //   if (localDebug) {
+            //     console.log('execute returning myChildProcess');
+            //   }
+            //   resolve(myChildProcess as ChildProcessWithoutNullStreams);
+            // }
           }
         );
       });

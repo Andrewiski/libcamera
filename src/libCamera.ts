@@ -83,13 +83,11 @@ function runCommand({
     //}
     let results = execute.runCommand({ cmdCommand });
     results.then(function(exResults) {
-      let resultsType = typeof exResults;
-      if (localDebug) {
-        console.log('resultsType=', resultsType);
-      }
-      if (resultsType !== 'string') {
-        let childProcess = exResults as ChildProcessWithoutNullStreams;
-        let stdOut = childProcess.stdout;
+      
+      //let childProcess = exResults.childProcess;
+      if(typeof exResults.stdout !== "string"){
+        console.log("stdOutType=" + typeof exResults.stdout);
+        let stdOut = exResults.stdout;
         let myStreamWritable = config.output as streamWritable;
         stdOut.pipe(myStreamWritable, { end: true });
         // Handle output stream events

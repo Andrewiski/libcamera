@@ -1,27 +1,28 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
 import { Writable as streamWritable } from 'stream';
+import { ExecuteResult } from './utils/types';
 
 export interface PiCameraOutput {
   jpeg: ({
     config,
   }: {
     config: PiCameraConfig;
-  }) => string | Promise<ChildProcessWithoutNullStreams | string>;
+  }) => string | Promise<ExecuteResult>;
   still: ({
     config,
   }: {
     config: PiCameraConfig;
-  }) => string | Promise<ChildProcessWithoutNullStreams | string>;
+  }) => string | Promise<ExecuteResult>;
   vid: ({
     config,
   }: {
     config: PiCameraConfig;
-  }) => string | Promise<ChildProcessWithoutNullStreams | string>;
+  }) => string | Promise<ExecuteResult>;
   raw: ({
     config,
   }: {
     config: PiCameraConfig;
-  }) => string | Promise<ChildProcessWithoutNullStreams | string>;
+  }) => string | Promise<ExecuteResult>;
 }
 
 export interface PiCameraConfig {

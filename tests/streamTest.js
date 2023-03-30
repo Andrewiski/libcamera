@@ -29,22 +29,14 @@ const { Stream } = require("stream");
         if (chunkCounter >= chunkShow) {
             console.log("incomingMonitorStream", "chunks processed: ", chunkCounter);
             chunkShow = chunkShow + 50;
-            
         }
-
         next();
     };
 
     incomingTransStream.pipe(incomingMonitorStream);
     console.log("Starting libcamera")
 
-    let results = libcamera.vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, timeout:10000, "output": incomingTransStream } })
-    if(results.then !== undefined){
-        results.then(result => console.log("Got Results"))
-        results.catch(err => console.log(err));
-    }else{
-        console.log("results typeof=" + typeof results);
-        if (typeof results === 'string'){
-            console.log("results=" + results )
-        }
-    }
+    let results = libcamera.vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, timeout:10000, "output": incomingTransStream } });
+    results.then(executeResult => console.log("Got Results"));
+    results.catch(executeResult => console.log(executeResult.error + " "+ executeResult.stderr.trim()));
+    
