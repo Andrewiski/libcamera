@@ -17,9 +17,7 @@ export default function buildMakeLibCamera({
   rawCommands: Commands;
 }) {
   return function makeLibCamera(): PiCameraOutput {
-    if (process.env.NODE_ENV) {
-      console.log('NODE_ENV= ', process.env.NODE_ENV);
-    }
+    
     return Object.freeze({
       jpeg: ({ config }: { config: PiCameraConfig }) => {
         config = configShouldBeAnObject({ config });
@@ -60,7 +58,16 @@ export default function buildMakeLibCamera({
     });
   };
 }
-
+let localDebug = false;
+if (
+  process.env.NODE_ENV === 'test' ||
+  process.env.NODE_ENV === 'development' || process.env.DEBUG  
+){
+  localDebug = true;
+}
+if (localDebug) {
+  console.log('localDebug=true');
+}
 function runCommand({
   execute,
   cmdCommand,
@@ -73,7 +80,10 @@ function runCommand({
   try {
     let results = execute.runCommand({ cmdCommand });
     results.then(function(exResults) {
-      let resultsType = typeof SpeechRecognitionResultList;
+      let resultsType = typeof exResults;
+      if(localDebug){
+        console.log("resultsType=", resultsType);
+      }
       if (resultsType !== 'string') {
         let childProcess = exResults as ChildProcessWithoutNullStreams;
         let stdOut = childProcess.stdout;
@@ -138,10 +148,7 @@ function makeJpeg({
     config,
   });
 
-  if (
-    process.env.NODE_ENV === 'test' ||
-    process.env.NODE_ENV === 'development'
-  ) {
+  if ( localDebug === true) {
     console.log('cmdCommand = ', cmdCommand);
     return cmdCommand;
   }
@@ -168,10 +175,7 @@ function makeStill({
       config,
     });
 
-    if (
-      process.env.NODE_ENV === 'test' ||
-      process.env.NODE_ENV === 'development'
-    ) {
+    if (localDebug === true) {
       console.log('cmdCommand = ', cmdCommand);
       return cmdCommand;
     }
@@ -205,10 +209,7 @@ function makeVid({
       config,
     });
 
-    if (
-      process.env.NODE_ENV === 'test' ||
-      process.env.NODE_ENV === 'development'
-    ) {
+    if (localDebug === true) {
       console.log('cmdCommand = ', cmdCommand);
       return cmdCommand;
     }
@@ -242,10 +243,7 @@ function makeRaw({
       config,
     });
 
-    if (
-      process.env.NODE_ENV === 'test' ||
-      process.env.NODE_ENV === 'development'
-    ) {
+    if (localDebug === true) {
       console.log('cmdCommand = ', cmdCommand);
       return cmdCommand;
     }
