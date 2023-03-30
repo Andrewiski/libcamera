@@ -1,15 +1,21 @@
-import { Writable as streamWritable } from 'stream';
-import { Spawn } from './utils/types';
+import { Writable, Readable } from 'stream';
+import {
+  spawn,
+  ChildProcessByStdio,
+  SpawnOptionsWithStdioTuple,
+  StdioNull,
+  StdioPipe,
+  ChildProcessWithoutNullStreams,
+  ChildProcess,
+} from 'child_process';
 import { PiCameraOutput, PiCameraConfig, Commands } from './types';
 
 export default function buildMakeLibCamera({
-  spawn,
   jpegCommands,
   stillCommands,
   vidCommands,
   rawCommands,
 }: {
-  spawn: Spawn;
   jpegCommands: Commands;
   stillCommands: Commands;
   vidCommands: Commands;
@@ -22,7 +28,6 @@ export default function buildMakeLibCamera({
         return makeJpeg({
           Flags: jpegCommands.Flags,
           Options: jpegCommands.Options,
-          spawn,
           config,
         });
       },
@@ -31,7 +36,6 @@ export default function buildMakeLibCamera({
         return makeStill({
           Flags: stillCommands.Flags,
           Options: stillCommands.Options,
-          spawn,
           config,
         });
       },
@@ -40,7 +44,6 @@ export default function buildMakeLibCamera({
         return makeVid({
           Flags: vidCommands.Flags,
           Options: vidCommands.Options,
-          spawn,
           config,
         });
       },
@@ -49,7 +52,6 @@ export default function buildMakeLibCamera({
         return makeRaw({
           Flags: rawCommands.Flags,
           Options: rawCommands.Options,
-          spawn,
           config,
         });
       },
@@ -57,129 +59,62 @@ export default function buildMakeLibCamera({
   };
 }
 let localDebug = false;
-if (
-  process.env.NODE_ENV === 'test' ||
-  process.env.NODE_ENV === 'development' ||
-  process.env.DEBUG
-) {
+if (process.env.NODE_ENV === 'development' || process.env.DEBUG) {
   localDebug = true;
 }
 if (localDebug) {
   console.log('localDebug=true');
 }
-function runCommand({
-  spawn,
-  cmdCommand,
-  config,
-}: {
-  spawn: Spawn;
-  cmdCommand: string;
-  config: PiCameraConfig;
-}) {
-  try {
-    // if (localDebug) {
-    console.log('runCommand called');
-    //}
-    let results = spawn.runCommand({ cmdCommand });
-    results.then(function(exResults) {
-      //let childProcess = exResults.childProcess;
-      if (typeof exResults.stdout !== 'string') {
-        console.log('stdOutType=' + typeof exResults.stdout);
-        let stdOut = exResults.stdout;
-        let myStreamWritable = config.output as streamWritable;
-        stdOut.pipe(myStreamWritable, { end: true });
-        // Handle output stream events
-        // outputStream.target.on('close', function() {
-        //  self.logger.debug('Output stream closed, scheduling kill for ffmpeg process');
-        //  // Don't kill process yet, to give a chance to ffmpeg to
-        //  // terminate successfully first  This is necessary because
-        //  // under load, the process 'exit' event sometimes happens
-        //  // after the output stream 'close' event.
-        //  setTimeout(function() {
-        //    emitEnd(new Error('Output stream closed'));
-        //    ffmpegProc.kill();
-        //  }, 20);
-        //  });
-        //  outputStream.target.on('error', function(err) {
-        //    self.logger.debug('Output stream error, killing ffmpeg process');
-        //    var reportingErr = new Error('Output stream error: ' + err.message);
-        //    reportingErr.outputStreamError = err;
-        //    emitEnd(reportingErr, stdoutRing.get(), stderrRing.get());
-        //    ffmpegProc.kill('SIGKILL');
-        //  });
-      }
-    });
-    results.catch((err: unknown) => {
-      if (localDebug) {
-        console.log('run command error');
-      }
-      if (err instanceof Error) {
-        throw new Error(`Things exploded (${err.message})`);
-      } else if (typeof err === 'string') {
-        throw new Error(err);
-      } else {
-        throw new Error('Unknown error in run command');
-      }
-    });
-    return results;
-  } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(`Things exploded (${err.message})`);
-    } else {
-      throw new Error('Unknown error');
-    }
-  }
-}
 
 function makeJpeg({
   Flags,
   Options,
-  spawn,
   config,
 }: {
   Flags: Commands['Flags'];
   Options: Commands['Options'];
-  spawn: Spawn;
   config: PiCameraConfig;
 }) {
-  const cmdCommand = createTakePictureCommand({
+  const cmd = createTakePictureCommand({
     baseType: 'libcamera-jpeg',
     Flags,
     Options,
-    spawn,
     config,
   });
 
   if (localDebug === true) {
-    console.log('cmdCommand = ', cmdCommand);
+    console.log('cmdCommand = ', cmd);
   }
-  return runCommand({ spawn, cmdCommand, config });
+  if (process.env.NODE_ENV === 'test') {
+    return cmd;
+  }
+  return runCommand({ cmd, config });
 }
 
 function makeStill({
   Flags,
   Options,
-  spawn,
   config,
 }: {
   Flags: Commands['Flags'];
   Options: Commands['Options'];
-  spawn: Spawn;
   config: PiCameraConfig;
 }) {
   try {
-    const cmdCommand = createTakePictureCommand({
+    const cmd = createTakePictureCommand({
       baseType: 'libcamera-still',
       Flags,
       Options,
-      spawn,
       config,
     });
 
     if (localDebug === true) {
-      console.log('cmdCommand = ', cmdCommand);
+      console.log('cmdCommand = ', cmd);
     }
-    return runCommand({ spawn, cmdCommand, config });
+    if (process.env.NODE_ENV === 'test') {
+      return cmd;
+    }
+    return runCommand({ cmd, config });
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(`Things exploded (${err.message})`);
@@ -192,27 +127,27 @@ function makeStill({
 function makeVid({
   Flags,
   Options,
-  spawn,
   config,
 }: {
   Flags: Commands['Flags'];
   Options: Commands['Options'];
-  spawn: Spawn;
   config: PiCameraConfig;
 }) {
   try {
-    const cmdCommand = createTakePictureCommand({
+    const cmd = createTakePictureCommand({
       baseType: 'libcamera-vid',
       Flags,
       Options,
-      spawn,
       config,
     });
 
     if (localDebug === true) {
-      console.log('cmdCommand = ', cmdCommand);
+      console.log('cmdCommand = ', cmd);
     }
-    return runCommand({ spawn, cmdCommand, config });
+    if (process.env.NODE_ENV === 'test') {
+      return cmd;
+    }
+    return runCommand({ cmd, config });
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(`Things exploded (${err.message})`);
@@ -225,27 +160,27 @@ function makeVid({
 function makeRaw({
   Flags,
   Options,
-  spawn,
   config,
 }: {
   Flags: Commands['Flags'];
   Options: Commands['Options'];
-  spawn: Spawn;
   config: PiCameraConfig;
 }) {
   try {
-    const cmdCommand = createTakePictureCommand({
+    const cmd = createTakePictureCommand({
       baseType: 'libcamera-raw',
       Flags,
       Options,
-      spawn,
       config,
     });
 
     if (localDebug === true) {
-      console.log('cmdCommand = ', cmdCommand);
+      console.log('cmdCommand = ', cmd);
     }
-    return runCommand({ spawn, cmdCommand, config });
+    if (process.env.NODE_ENV === 'test') {
+      return cmd;
+    }
+    return runCommand({ cmd, config });
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(`Things exploded (${err.message})`);
@@ -259,7 +194,6 @@ function createTakePictureCommand({
   baseType,
   Flags,
   Options,
-  spawn,
   config,
 }: {
   baseType:
@@ -269,15 +203,14 @@ function createTakePictureCommand({
     | 'libcamera-raw';
   Flags: Commands['Flags'];
   Options: Commands['Options'];
-  spawn: Spawn;
   config: PiCameraConfig;
 }) {
-  const cmdCommand = spawn.cmdCommand({
+  const cmd = cmdCommand({
     base: baseType,
     params: prepareConfigOptsAndFlags(config, { Flags, Options }),
   });
 
-  return cmdCommand;
+  return cmd;
 }
 
 function configShouldBeAnObject({ config }: { config: any }) {
@@ -327,4 +260,98 @@ function prepareConfigOptsAndFlags(
     config.outputIsStream = true;
   }
   return configArray;
+}
+function cmdCommand({ base, params }: { base: string; params: Array<string> }) {
+  if (!params && base) {
+    return base;
+  }
+
+  if (!Array.isArray(params)) {
+    throw new Error('params must be an Array');
+  }
+
+  return base + ' ' + params.join(' ');
+}
+
+function runCommand({
+  cmd,
+  config,
+}: {
+  cmd: string;
+  config: PiCameraConfig;
+}): Promise<
+  | ChildProcess
+  | ChildProcessWithoutNullStreams
+  | ChildProcessByStdio<Writable, Readable, Readable>
+  | ChildProcessByStdio<Writable, Readable, null>
+  | ChildProcessByStdio<Writable, null, Readable>
+  | ChildProcessByStdio<null, Readable, Readable>
+  | ChildProcessByStdio<Writable, null, null>
+  | ChildProcessByStdio<null, Readable, null>
+  | ChildProcessByStdio<null, null, Readable>
+  | ChildProcessByStdio<null, null, null>
+> {
+  try {
+    return new Promise((resolve, reject) => {
+      try {
+        let myIoOutWritable: StdioNull | StdioPipe = 'ignore';
+        let myIoErrWritable: StdioNull | StdioPipe = 'ignore';
+        if (config.outputIsStream) {
+          myIoOutWritable = config.output as Writable;
+        }
+        let spawnOptions: SpawnOptionsWithStdioTuple<
+          StdioNull | StdioPipe,
+          StdioNull | StdioPipe,
+          StdioNull | StdioPipe
+        > = {
+          argv0: undefined,
+          stdio: ['ignore', myIoOutWritable, myIoErrWritable], //'overlapped' | 'pipe' | 'ignore' | 'inherit';
+          shell: undefined,
+          windowsVerbatimArguments: undefined,
+          detached: false,
+        };
+        let myChildProcess:
+          | ChildProcess
+          | ChildProcessWithoutNullStreams
+          | ChildProcessByStdio<Writable, Readable, Readable>
+          | ChildProcessByStdio<Writable, Readable, null>
+          | ChildProcessByStdio<Writable, null, Readable>
+          | ChildProcessByStdio<null, Readable, Readable>
+          | ChildProcessByStdio<Writable, null, null>
+          | ChildProcessByStdio<null, Readable, null>
+          | ChildProcessByStdio<null, null, Readable>
+          | ChildProcessByStdio<null, null, null> = spawn(cmd, spawnOptions);
+        //let stdOut = myChildProcess.stdout;
+
+        //stdOut.pipe(myStreamWritable, { end: true });
+        // Handle output stream events
+        // outputStream.target.on('close', function() {
+        //  self.logger.debug('Output stream closed, scheduling kill for ffmpeg process');
+        //  // Don't kill process yet, to give a chance to ffmpeg to
+        //  // terminate successfully first  This is necessary because
+        //  // under load, the process 'exit' event sometimes happens
+        //  // after the output stream 'close' event.
+        //  setTimeout(function() {
+        //    emitEnd(new Error('Output stream closed'));
+        //    ffmpegProc.kill();
+        //  }, 20);
+        //  });
+        //  outputStream.target.on('error', function(err) {
+        //    self.logger.debug('Output stream error, killing ffmpeg process');
+        //    var reportingErr = new Error('Output stream error: ' + err.message);
+        //    reportingErr.outputStreamError = err;
+        //    emitEnd(reportingErr, stdoutRing.get(), stderrRing.get());
+        //    ffmpegProc.kill('SIGKILL');
+        //  });
+
+        resolve(myChildProcess);
+      } catch (ex) {
+        console.log('spawn error = ', ex);
+        reject(ex);
+      }
+    });
+  } catch (err) {
+    console.log('Run command error = ', err);
+    throw new Error('Error in execute run command');
+  }
 }
