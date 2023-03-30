@@ -17,7 +17,6 @@ export default function buildMakeLibCamera({
   rawCommands: Commands;
 }) {
   return function makeLibCamera(): PiCameraOutput {
-    
     return Object.freeze({
       jpeg: ({ config }: { config: PiCameraConfig }) => {
         config = configShouldBeAnObject({ config });
@@ -61,8 +60,9 @@ export default function buildMakeLibCamera({
 let localDebug = false;
 if (
   process.env.NODE_ENV === 'test' ||
-  process.env.NODE_ENV === 'development' || process.env.DEBUG  
-){
+  process.env.NODE_ENV === 'development' ||
+  process.env.DEBUG
+) {
   localDebug = true;
 }
 if (localDebug) {
@@ -81,8 +81,8 @@ function runCommand({
     let results = execute.runCommand({ cmdCommand });
     results.then(function(exResults) {
       let resultsType = typeof exResults;
-      if(localDebug){
-        console.log("resultsType=", resultsType);
+      if (localDebug) {
+        console.log('resultsType=', resultsType);
       }
       if (resultsType !== 'string') {
         let childProcess = exResults as ChildProcessWithoutNullStreams;
@@ -148,7 +148,7 @@ function makeJpeg({
     config,
   });
 
-  if ( localDebug === true) {
+  if (localDebug === true) {
     console.log('cmdCommand = ', cmdCommand);
     return cmdCommand;
   }
