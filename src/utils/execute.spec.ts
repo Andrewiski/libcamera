@@ -1,14 +1,14 @@
-import { execute } from '.';
+import { spawnproc } from '.';
 
-describe('execute', () => {
+describe('spawnproc', () => {
   it('run command is correct', async () => {
-    const commandResponse = await execute.runCommand({
+    const commandResponse = await spawnproc.runCommand({
       cmdCommand: "echo 'test'",
     });
     expect(commandResponse).toContain('test');
   });
   it('Node work but there is an stderr', async () => {
-    const commandResponse = await execute.runCommand({
+    const commandResponse = await spawnproc.runCommand({
       cmdCommand: ">&2 echo 'error'",
     });
 
@@ -18,7 +18,7 @@ describe('execute', () => {
 
   it('Node exception. Command not found', async () => {
     await expect(
-      execute.runCommand({
+      spawnproc.runCommand({
         cmdCommand: 'noCommand',
       })
     ).rejects.toEqual('/bin/sh: 1: noCommand: not found');
@@ -26,7 +26,7 @@ describe('execute', () => {
 
   it('cmd command is correct', () => {
     const params = ['--option1', 'optionResponse', '-flags1', 'flagsResponse'];
-    expect(execute.cmdCommand({ base: 'cmdCommand', params })).toEqual(
+    expect(spawnproc.cmdCommand({ base: 'cmdCommand', params })).toEqual(
       'cmdCommand --option1 optionResponse -flags1 flagsResponse'
     );
   });

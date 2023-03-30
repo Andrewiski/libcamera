@@ -4,11 +4,11 @@ import {
   vidCommands,
   rawCommands,
 } from './libCamera.config';
-import { execute } from './utils';
+import { spawnproc as spawn } from './utils';
 
 import buildMakeLibCamera from './libCamera';
 const makeLibCamera = buildMakeLibCamera({
-  execute,
+  spawn,
   jpegCommands,
   stillCommands,
   vidCommands,

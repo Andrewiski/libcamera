@@ -1,6 +1,5 @@
-import { Writable as streamWritable, Readable } from 'stream';
+import { Writable, Readable } from 'stream';
 import { ChildProcessByStdio } from 'child_process';
-
 
 export interface PiCameraOutput {
   jpeg: ({
@@ -26,7 +25,7 @@ export interface PiCameraOutput {
 }
 
 export interface PiCameraConfig {
-  [key: string]: string | number | boolean | streamWritable;
+  [key: string]: string | number | boolean | Writable;
 }
 
 export interface Commands {
