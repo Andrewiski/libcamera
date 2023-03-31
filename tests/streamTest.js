@@ -51,6 +51,7 @@ const fs = require('fs');
         executeResult.on("exit",() => {
             console.log("exit");
         });
+        executeResult.stderr.on("data",(data) => console.log(data.toString()))
         //executeResult.stdout.on("data",(data) => console.log(data.toString()))
         //executeResult.stdout.pipe( incomingMonitorStream);
     });
