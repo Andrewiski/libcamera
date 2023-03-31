@@ -30,8 +30,8 @@ const fs = require('fs');
         chunkCounter++;
         //commonData.streamStats.chunkCounter++; //remove after new Management Server
         if (chunkCounter >= chunkShow) {
-            console.log("incomingMonitorStream", "chunks processed: ", chunkCounter);
-            chunkShow = chunkShow + 50;
+            console.log("incomingMonitorStream", "chunks processed: ", chunkCounter, chunk.length);
+            chunkShow = chunkShow + 10;
         }
         next();
     };
@@ -42,7 +42,7 @@ const fs = require('fs');
     incomingTransStream.pipe(incomingMonitorStream);
     console.log("Starting libcamera")
     
-    let results = libcamera.vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, "nopreview":1, timeout:10000, "output": incomingMonitorStream } });
+    let results = libcamera.vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, "nopreview":1, timeout:100000, "output": incomingMonitorStream } });
     results.then(executeResult => {
         console.log("Got Results");
         executeResult.on("error",(ex) => {
