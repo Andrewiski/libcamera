@@ -5,13 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "env": {"NODE_ENV": "test"},
+            "env": {"DEBUG": "libcamera"},
             "command": "node ./tests/streamTest.js",
-            "name": "LocalDebug Run node tests/streamTest.js",
+            "name": "LocalDebug Build Run node tests/streamTest.js",
             "request": "launch",
             "type": "node-terminal",
             "preLaunchTask": "npm: build"
         },
-
+        {
+            "env": {"DEBUG": "libcamera"},
+            "command": "node ./tests/streamTest.js",
+            "name": "LocalDebug Run node tests/streamTest.js",
+            "request": "launch",
+            "type": "node-terminal"
+        }
     ]
 }

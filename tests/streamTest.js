@@ -2,7 +2,10 @@
 var util = require('util');
 const { libcamera } = require('../dist/index.js');
 
-const { Stream } = require("stream");
+const { Stream, Readable, Writable, ReadableOptions, Duplex } = require("stream");
+const { WriteStream, ReadStream } = require('fs');
+const fs = require('fs');
+    //var myStream = new Duplex(); // fs.openSync('./out.log', 'a'); //new WriteStream({path:"temp.txt"})
 
     var incomingTransStream = null;
     var incomingTransStreamChunkCounter = 0;
@@ -32,11 +35,26 @@ const { Stream } = require("stream");
         }
         next();
     };
+    incomingMonitorStream._final = ()=>{
+        console.log("incomingMonitorStream", "final");
+    }
 
     incomingTransStream.pipe(incomingMonitorStream);
     console.log("Starting libcamera")
-
-    let results = libcamera.vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, "nopreview":1, timeout:10000, "output": incomingTransStream } });
-    results.then(executeResult => console.log("Got Results"));
-    results.catch(executeResult => console.log(executeResult.error + " "+ executeResult.stderr.trim()));
+    
+    let results = libcamera.vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, "nopreview":1, timeout:10000, "output": incomingMonitorStream } });
+    results.then(executeResult => {
+        console.log("Got Results");
+        executeResult.on("error",(ex) => {
+            console.log("error", ex);
+        });
+        executeResult.on("exit",() => {
+            console.log("exit");
+        });
+        //executeResult.stdout.on("data",(data) => console.log(data.toString()))
+        //executeResult.stdout.pipe( incomingMonitorStream);
+    });
+    results.catch(executeResult => {
+        console.log(executeResult.message)
+    });
     

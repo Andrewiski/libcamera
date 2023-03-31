@@ -234,23 +234,23 @@ function prepareConfigOptsAndFlags(
     } else if (Options.includes(key)) {
       if (
         key === 'output' &&
-        config[key] !== null &&
-        typeof config[key] === 'object' &&
-        typeof config[key].pipe === 'function'
+        config.output !== null &&
+        typeof config.output !== 'string' //&&
+        //typeof config[key].pipe === 'function'
       ) {
-        //This is a request to output the data to a stream object
-        if (
-          config[key].writable !== false &&
-          typeof config[key]._write === 'function' &&
-          typeof config[key]._writableState === 'object'
-        ) {
+        // //This is a request to output the data to a stream object
+        // if (
+        //   config[key].writable !== false &&
+        //   typeof config[key]._write === 'function' &&
+        //   typeof config[key]._writableState === 'object'
+        // ) {
           outputIsStream = true;
           //-o -
           //configArray.push(`--${key}`, config[key]);
           configArray.push(`-o`, '-');
-        } else {
-          throw new Error('Stream is not writable');
-        }
+        // } else {
+        //   throw new Error('Stream is not writable');
+        // }
       } else {
         configArray.push(`--${key}`, config[key]);
       }
@@ -299,12 +299,12 @@ function runCommand({
         let stdOut: StdioNull | StdioPipe = null;
         let stdErr: StdioNull | StdioPipe = null;
 
-        if (config.outputIsStream) {
-          //stdOut = config.output as Writable;
-          if(localDebug){
-            console.log("output is piped to stdOut")
-          }
-        }
+        // if (config.outputIsStream) {
+        //   //stdOut = (config.output as StdioNull);
+        //   if(localDebug){
+        //     console.log("output is piped to stdOut")
+        //   }
+        // }
         let spawnOptions: SpawnOptionsWithStdioTuple<
           StdioNull | StdioPipe,
           StdioNull | StdioPipe,
@@ -312,7 +312,7 @@ function runCommand({
         > = {
           argv0: undefined,
           stdio: [stdIn, stdOut, stdErr], //'overlapped' | 'pipe' | 'ignore' | 'inherit';
-          shell: undefined,
+          shell: true, //undefined,
           windowsVerbatimArguments: undefined,
           detached: false,
         };
@@ -353,7 +353,30 @@ function runCommand({
         //    emitEnd(reportingErr, stdoutRing.get(), stderrRing.get());
         //    ffmpegProc.kill('SIGKILL');
         //  });
-
+        if(localDebug){
+          myChildProcess.on("error",
+          (ex) =>
+          {
+            console.log(ex.message)
+          })
+          myChildProcess.on("exit",
+          (foo) =>
+          {
+            if(foo){
+              console.log("foo");
+            }
+            console.log("On Exit");
+          })
+        }
+        if (config.outputIsStream) {
+          if(localDebug){
+            console.log("output is piped to stdOut")
+          }
+          myChildProcess.stdout?.pipe((config.output as Writable))
+          
+          //stdOut = (config.output as StdioNull);
+          
+        }
         resolve(myChildProcess);
       } catch (ex) {
         console.log('spawn error = ', ex);

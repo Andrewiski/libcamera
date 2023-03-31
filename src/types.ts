@@ -81,7 +81,7 @@ export interface PiCameraOutput {
 }
 
 export interface PiCameraConfig {
-  [key: string]: string | number | boolean | Writable;
+  [key: string]: string | number | boolean | Readable | Writable;
 }
 
 export interface Commands {
