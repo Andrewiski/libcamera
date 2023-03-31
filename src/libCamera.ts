@@ -244,10 +244,10 @@ function prepareConfigOptsAndFlags(
         //   typeof config[key]._write === 'function' &&
         //   typeof config[key]._writableState === 'object'
         // ) {
-          outputIsStream = true;
-          //-o -
-          //configArray.push(`--${key}`, config[key]);
-          configArray.push(`-o`, '-');
+        outputIsStream = true;
+        //-o -
+        //configArray.push(`--${key}`, config[key]);
+        configArray.push(`-o`, '-');
         // } else {
         //   throw new Error('Stream is not writable');
         // }
@@ -353,29 +353,24 @@ function runCommand({
         //    emitEnd(reportingErr, stdoutRing.get(), stderrRing.get());
         //    ffmpegProc.kill('SIGKILL');
         //  });
-        if(localDebug){
-          myChildProcess.on("error",
-          (ex) =>
-          {
-            console.log(ex.message)
-          })
-          myChildProcess.on("exit",
-          (foo) =>
-          {
-            if(foo){
-              console.log("foo");
+        if (localDebug) {
+          myChildProcess.on('error', ex => {
+            console.log(ex.message);
+          });
+          myChildProcess.on('exit', foo => {
+            if (foo) {
+              console.log('foo');
             }
-            console.log("On Exit");
-          })
+            console.log('On Exit');
+          });
         }
         if (config.outputIsStream) {
-          if(localDebug){
-            console.log("output is piped to stdOut")
+          if (localDebug) {
+            console.log('output is piped to stdOut');
           }
-          myChildProcess.stdout?.pipe((config.output as Writable))
-          
+          myChildProcess.stdout?.pipe(config.output as Writable);
+
           //stdOut = (config.output as StdioNull);
-          
         }
         resolve(myChildProcess);
       } catch (ex) {
