@@ -149,7 +149,12 @@ function makeVid({
     if (process.env.NODE_ENV === 'test') {
       return parseCommand(cmd);
     }
-    if (process.platform === 'win32' && ( config.libcamaraPath === undefined ||  config.libcamaraPath === "") && (process.env.LIBCAMARA_PATH === undefined || process.env.LIBCAMARA_PATH === '')) {
+    if (
+      process.platform === 'win32' &&
+      (config.libcamaraPath === undefined || config.libcamaraPath === '') &&
+      (process.env.LIBCAMARA_PATH === undefined ||
+        process.env.LIBCAMARA_PATH === '')
+    ) {
       config.libcamaraPath = __dirname;
     }
 
@@ -316,23 +321,25 @@ function runCommand({
           StdioNull | StdioPipe,
           StdioNull | StdioPipe
         > = {
-          argv0:  undefined,
+          argv0: undefined,
           stdio: [stdIn, stdOut, stdErr], //'overlapped' | 'pipe' | 'ignore' | 'inherit';
           shell: true, //undefined,
           windowsVerbatimArguments: undefined,
           detached: false,
         };
-        let fullPath : string = path.join((config.libcamaraPath as string | undefined) || "", cmd.base);
-        if(config.libcamaraPathExt){
+        let fullPath: string = path.join(
+          (config.libcamaraPath as string | undefined) || '',
+          cmd.base
+        );
+        if (config.libcamaraPathExt) {
           fullPath = fullPath + config.libcamaraPathExt;
         }
-        if(localDebug){
-          console.log("libcamera FullPath=" + fullPath)
+        if (localDebug) {
+          console.log('libcamera FullPath=' + fullPath);
         }
-        if(fullPath.indexOf(path.sep) >= 0){
-          if(fs.existsSync(fullPath)===false){
-
-            throw new Error("Executable not found! " + fullPath);
+        if (fullPath.indexOf(path.sep) >= 0) {
+          if (fs.existsSync(fullPath) === false) {
+            throw new Error('Executable not found! ' + fullPath);
           }
         }
         let myChildProcess:
@@ -387,7 +394,7 @@ function runCommand({
           if (localDebug) {
             console.log('output is piped to stdOut');
           }
-          if(config.output){
+          if (config.output) {
             myChildProcess.stdout?.pipe(config.output as Writable);
           }
           //stdOut = (config.output as StdioNull);
