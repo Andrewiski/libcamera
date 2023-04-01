@@ -42,7 +42,7 @@ const fs = require('fs');
     incomingTransStream.pipe(incomingMonitorStream);
     console.log("Starting libcamera")
     
-    let results = libcamera.vid({ config: { "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, "nopreview":1, timeout:100000, "output": incomingMonitorStream } });
+    let results = libcamera.vid({ config: { "libcamaraPath": "C:\\Users\\adevries\\Source\\repos\\andrewiski\\libcamera\\windows", "libcamaraPathExt" : ".cmd", "width": "1080", "height": "768", "autofocus-mode": "manual", "inline":true, "nopreview":1, timeout:100000, "output": incomingMonitorStream } });
     results.then(executeResult => {
         console.log("Got Results");
         executeResult.on("error",(ex) => {

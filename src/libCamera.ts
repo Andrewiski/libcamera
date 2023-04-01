@@ -1,4 +1,6 @@
 import { Writable, Readable } from 'stream';
+import path from 'node:path';
+import fs from 'node:fs';
 import {
   spawn,
   ChildProcessByStdio,
@@ -147,6 +149,10 @@ function makeVid({
     if (process.env.NODE_ENV === 'test') {
       return parseCommand(cmd);
     }
+    if (process.platform === 'win32' && ( config.libcamaraPath === undefined ||  config.libcamaraPath === "") && (process.env.LIBCAMARA_PATH === undefined || process.env.LIBCAMARA_PATH === '')) {
+      config.libcamaraPath = __dirname;
+    }
+
     return runCommand({ cmd, config });
   } catch (err) {
     if (err instanceof Error) {
@@ -310,12 +316,25 @@ function runCommand({
           StdioNull | StdioPipe,
           StdioNull | StdioPipe
         > = {
-          argv0: undefined,
+          argv0:  undefined,
           stdio: [stdIn, stdOut, stdErr], //'overlapped' | 'pipe' | 'ignore' | 'inherit';
           shell: true, //undefined,
           windowsVerbatimArguments: undefined,
           detached: false,
         };
+        let fullPath : string = path.join((config.libcamaraPath as string | undefined) || "", cmd.base);
+        if(config.libcamaraPathExt){
+          fullPath = fullPath + config.libcamaraPathExt;
+        }
+        if(localDebug){
+          console.log("libcamera FullPath=" + fullPath)
+        }
+        if(fullPath.indexOf(path.sep) >= 0){
+          if(fs.existsSync(fullPath)===false){
+
+            throw new Error("Executable not found! " + fullPath);
+          }
+        }
         let myChildProcess:
           | ChildProcess
           | ChildProcessWithoutNullStreams
@@ -327,7 +346,7 @@ function runCommand({
           | ChildProcessByStdio<null, Readable, null>
           | ChildProcessByStdio<null, null, Readable>
           | ChildProcessByStdio<null, null, null> = spawn(
-          cmd.base,
+          fullPath,
           cmd.params,
           spawnOptions
         );
@@ -368,8 +387,9 @@ function runCommand({
           if (localDebug) {
             console.log('output is piped to stdOut');
           }
-          myChildProcess.stdout?.pipe(config.output as Writable);
-
+          if(config.output){
+            myChildProcess.stdout?.pipe(config.output as Writable);
+          }
           //stdOut = (config.output as StdioNull);
         }
         resolve(myChildProcess);
